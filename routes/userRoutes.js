@@ -5,13 +5,19 @@ const authController = require('../controllers/authController');
 ///// ROUTES /////
 const router = express.Router();
 
-// user creation (special, non-RESTful route)
+// user creation (special, non-RESTful routes)
 router.route('/signup').post(authController.signup);
 router.route('/login').post(authController.login);
-router
-  .route('/updatePassword')
-  .patch(authController.protect, authController.updatePassword);
 
+// user updates by the user themselves
+router
+  .route('/updateMyPassword')
+  .patch(authController.protect, authController.updatePassword);
+router
+  .route('/updateMe')
+  .patch(authController.protect, userController.updateMe);
+
+// 'forgot my password' routes
 router.route('/forgotPassword').post(authController.forgotPassword);
 router.route('/resetPassword/:token').patch(authController.resetPassword);
 

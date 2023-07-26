@@ -19,7 +19,11 @@ const createSendToken = function (user, statusCode, res) {
     status: 'success',
     token: token,
     data: {
-      user: user,
+      user: {
+        userName: user.userName,
+        email: user.email,
+        role: user.role,
+      },
     },
   });
 };
@@ -70,15 +74,7 @@ const signup = async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
   });
   const token = signToken({ id: newUser._id });
-  createSendToken(
-    {
-      userName: newUser.userName,
-      email: newUser.email,
-      role: newUser.role,
-    },
-    201,
-    res
-  );
+  createSendToken(newUser, 201, res);
 };
 
 const login = async (req, res, next) => {
