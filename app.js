@@ -11,9 +11,8 @@ const app = express();
 ///// GLOBAL MIDDLEWARES /////
 app.use(express.json());
 app.use(express.static('./public'));
-// TODO: ↓ Switch morgan to dev-only
 app.use(morgan('dev'));
-// if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 ///// ROUTES /////
 // mount routers

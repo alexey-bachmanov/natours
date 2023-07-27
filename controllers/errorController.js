@@ -2,12 +2,21 @@ const AppError = require('../utils/appError');
 
 ///// PROD/DEV ERROR HANDLING /////
 const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    error: err,
-    status: err.status,
-    message: err.message,
-    stack: err.stack,
-  });
+  // similar to sendErrorProd, just including error information
+  if (err.isOperational) {
+    res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+      error: err,
+    });
+  } else {
+    console.error(err);
+    res.status(500).json({
+      status: 'error',
+      message: 'internal server error',
+      error: err,
+    });
+  }
 };
 const sendErrorProd = (err, res) => {
   if (err.isOperational) {
@@ -16,8 +25,6 @@ const sendErrorProd = (err, res) => {
     res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
-      // TODO: ↓ remove error info from response
-      error: err,
     });
   } else {
     // programming errors, info should be logged to the
