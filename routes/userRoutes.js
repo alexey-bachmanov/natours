@@ -16,6 +16,9 @@ router
 router
   .route('/updateMe')
   .patch(authController.protect, userController.updateMe);
+router
+  .route('/deleteMe')
+  .delete(authController.protect, userController.deleteMe);
 
 // 'forgot my password' routes
 router.route('/forgotPassword').post(authController.forgotPassword);

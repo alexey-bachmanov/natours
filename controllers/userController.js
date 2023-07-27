@@ -59,6 +59,14 @@ const updateMe = async (req, res, next) => {
   });
 };
 
+const deleteMe = async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+};
+
 ///// LOAD AND EXPORT HANDLERS /////
 exports.getAllUsers = catchAsync(getAllUsers);
 exports.createUser = catchAsync(createUser);
@@ -66,3 +74,4 @@ exports.getUser = catchAsync(getUser);
 exports.patchUser = catchAsync(patchUser);
 exports.deleteUser = catchAsync(deleteUser);
 exports.updateMe = catchAsync(updateMe);
+exports.deleteMe = catchAsync(deleteMe);
