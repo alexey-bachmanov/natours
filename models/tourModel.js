@@ -4,12 +4,6 @@ const slugify = require('slugify');
 ///// SCHEMA /////
 const tourSchema = new mongoose.Schema(
   {
-    // startLocation: {
-    //   description: 'Miami, USA',
-    //   type: 'Point',
-    //   coordinates: [-80.185942, 25.774772],
-    //   address: '301 Biscayne Blvd, Miami, FL 33132, USA',
-    // },
     ratingsAverage: {
       type: Number,
       default: 4.5,
@@ -47,7 +41,6 @@ const tourSchema = new mongoose.Schema(
         message: 'difficulty must be easy, medium, or difficult',
       },
     },
-    // guides: ['5c8a22c62f8fb814b56fa18b', '5c8a1f4e2f8fb814b56fa185'],
     price: {
       type: Number,
       required: [true, 'tour must have price'],
@@ -73,8 +66,43 @@ const tourSchema = new mongoose.Schema(
       trim: true,
     },
     createdAt: { type: Date, default: Date.now(), select: false }, // select: never exposes this field
-    // locations: [],
     secretTour: { type: Boolean, default: false },
+    startLocation: {
+      // ↓ GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+      },
+      // ↑ GeoJSON
+      address: { type: String },
+      description: { type: String },
+    },
+    // embedded documents must be defined as an array of objects
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: {
+          type: [Number],
+        },
+        address: { type: String },
+        description: { type: String },
+        day: { type: Number },
+      },
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
