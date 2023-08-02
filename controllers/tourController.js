@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const Tour = require('../models/tourModel');
-const apiFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const apiFeatures = require('../utils/apiFeatures');
 
 ///// MIDDLEWARE FUNCTIONS /////
 exports.aliasTopTours = (req, res, next) => {
@@ -65,7 +65,6 @@ const getAllToursHandler = async (req, res, next) => {
 };
 
 const getTourHandler = async (req, res, next) => {
-  console.log('getTourHandler');
   const tour = await Tour.findById(req.params.id);
   res.status(200).json({
     status: 'success',

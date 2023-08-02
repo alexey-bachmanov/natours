@@ -58,18 +58,16 @@ module.exports = (err, req, res, next) => {
   let error = { ...err };
   error.statusCode = err.statusCode || 500;
   error.status = err.status || 'internal server error';
+
+  if (error._message && error._message.includes('validation failed'))
+    error = handleDBValidationError(err);
+  if (error.code === 11000) error = handleDBDuplicateError(err);
+  if (error.name === 'JsonWebTokenError') error = handleJWTInvalid(err);
+  if (error.name === 'TokenExpiredError') error = handleJWTExpired(err);
+
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(error, res);
   } else {
-    if (
-      error._message === 'Tour validation failed' ||
-      error._message === 'User validation failed'
-    )
-      error = handleDBValidationError(err);
-    if (error.code === 11000) error = handleDBDuplicateError(err);
-    if (error.name === 'JsonWebTokenError') error = handleJWTInvalid(err);
-    if (error.name === 'TokenExpiredError') error = handleJWTExpired(err);
     sendErrorProd(error, res);
-    // sendErrorDev(error, res);
   }
 };

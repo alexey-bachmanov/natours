@@ -144,6 +144,14 @@ tourSchema.pre(/^find/, function (next) {
 //   // docs points to found documents array
 //   next()
 // })
+tourSchema.pre(/^find/, function (next) {
+  // populates guides (child references → 'embedding' in queries)
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+  next();
+});
 
 // Aggregation middleware
 tourSchema.pre('aggregate', function (next) {

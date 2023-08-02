@@ -1,13 +1,15 @@
 ///// SETUP ENVIRONMENT VARIABLES/////
 const dotenv = require('dotenv');
 
-dotenv.config({ path: '../../config.env' });
+dotenv.config({ path: './config.env' });
 
 ///// IMPORTS /////
 const mongoose = require('mongoose');
 const fs = require('fs');
-const Tour = require('../../models/tourModel');
-const tours = JSON.parse(fs.readFileSync('./tours.json', 'utf-8'));
+const Tour = require('./models/tourModel');
+const tours = JSON.parse(
+  fs.readFileSync('./dev-data/data/tours.json', 'utf-8')
+);
 
 ///// MAIN FUNCTIONS /////
 const readAndSaveToDB = async () => {
