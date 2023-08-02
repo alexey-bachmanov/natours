@@ -114,6 +114,16 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+// virtually populate tour with reviews, which are otherwise
+// inaccesible because they are parent-referenced
+// any document where foreignField === localField is a
+// 'virtual child' of this document
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+});
+
 ///// MIDDLEWARE /////
 // Save middleware
 // AKA pre-save hook

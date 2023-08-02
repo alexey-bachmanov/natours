@@ -34,14 +34,11 @@ const reviewSchema = new mongoose.Schema(
 );
 
 ///// MIDDLEWARE /////
-// populate user and tour data on query
+// populate user data on query
 reviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'user',
     select: 'userName photo',
-  }).populate({
-    path: 'tour',
-    select: 'name',
   });
   next();
 });
