@@ -28,6 +28,13 @@ const createReviewHandler = async (req, res, next) => {
   // sanitize inputs
   if (req.body._id) delete req.body._id;
   if (req.body.id) delete req.body.id;
+
+  // if no tour specified, pull it from the route (/api/v1/tours/:tourId/reviews)
+  if (!req.body.tour) req.body.tour = req.params.tourId;
+
+  // if no user specified, pull it from the protect middleware
+  if (!req.body.user) req.body.user = req.user.id;
+
   const newReview = await Review.create(req.body);
   res.status(201).json({
     status: 'success',

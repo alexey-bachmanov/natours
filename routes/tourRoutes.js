@@ -1,11 +1,12 @@
 const express = require('express');
 const tourController = require('../controllers/tourController');
+const reviewController = require('../controllers/reviewController');
 const authController = require('../controllers/authController');
 
 const router = express.Router();
 
 ///// MIDDLEWARE /////
-router.param('id', tourController.checkID);
+router.param('tourId', tourController.checkID);
 // router.use((req, res, next) => {
 //   console.log(req.query, req.url);
 //   next();
@@ -27,7 +28,7 @@ router
   .post(tourController.createTour);
 
 router
-  .route('/:id')
+  .route('/:tourId')
   .get(tourController.getTour)
   .patch(tourController.patchTour)
   .delete(
@@ -35,5 +36,14 @@ router
     authController.restrictTo('admin', 'lead-guide'),
     tourController.deleteTour
   );
+
+// simple nested route, DON'T do this
+// router
+//   .route('/:tourId/reviews')
+//   .post(
+//     authController.protect,
+//     authController.restrictTo('user'),
+//     reviewController.createReview
+//   );
 
 module.exports = router;

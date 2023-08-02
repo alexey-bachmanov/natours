@@ -16,13 +16,12 @@ exports.aliasTopTours = (req, res, next) => {
 exports.checkID = async (req, res, next) => {
   try {
     // is the ID valid ?
-    if (!mongoose.isObjectIdOrHexString(req.params.id))
+    if (!mongoose.isObjectIdOrHexString(req.params.tourId))
       // call next() with an error in the args, so code skips to global error
       // handling middleware in app.js
       return next(new AppError('No tour found for that ID', 404));
-
     // does a valid tour exist with that ID?
-    const tourExists = await Tour.exists({ _id: req.params.id });
+    const tourExists = await Tour.exists({ _id: req.params.tourId });
     if (!tourExists)
       return next(new AppError('No tour found for that ID', 404));
   } catch (error) {
