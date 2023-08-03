@@ -5,20 +5,18 @@ const catchAsync = require('../utils/catchAsync');
 const apiFeatures = require('../utils/apiFeatures');
 const factory = require('./handlerFactory');
 
-///// HANDLERS /////
-const createReviewHandler = async (req, res, next) => {
+///// MIDDLEWARE /////
+exports.setTourAndUserIds = (req, res, next) => {
   // if no tour specified, pull it from the route (/api/v1/tours/:tourId/reviews)
   if (!req.body.tour) req.body.tour = req.params.tourId;
 
   // if no user specified, pull it from the protect middleware
   if (!req.body.user) req.body.user = req.user.id;
-
-  const newReview = await Review.create(req.body);
-  res.status(201).json({
-    status: 'success',
-    data: { review: newReview },
-  });
+  next();
 };
+
+///// HANDLERS /////
+exports.createReview = factory.createOne(Review);
 
 const getAllReviewsHandler = async (req, res, next) => {
   // check if this is a *specific* tour asking for its reviews
@@ -49,21 +47,10 @@ const getReviewHandler = async (req, res, next) => {
   });
 };
 
-const patchReviewHandler = async (req, res, next) => {
-  const review = await Review.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-  res.status(200).json({
-    status: 'success',
-    data: { review },
-  });
-};
+exports.patchReview = factory.patchOne(Review, 'id');
 
 exports.deleteReview = factory.deleteOne(Review, 'id');
 
 ///// LOAD AND EXPORT HANDLERS /////
-exports.createReview = catchAsync(createReviewHandler);
 exports.getAllReviews = catchAsync(getAllReviewsHandler);
 exports.getReview = catchAsync(getReviewHandler);
-exports.patchReview = catchAsync(patchReviewHandler);

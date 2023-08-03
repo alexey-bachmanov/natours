@@ -19,14 +19,14 @@ const getAllUsers = async (req, res, next) => {
   const users = await User.find();
   res.status(200).json({ status: 'success', data: { users: users } });
 };
-const createUser = factory.createOne(User);
+
 const getUser = async (req, res, next) => {
   res.status(500).json({ status: 'error', message: 'route not yet defined' });
 };
-const patchUser = async (req, res, next) => {
-  res.status(500).json({ status: 'error', message: 'route not yet defined' });
-};
-const deleteUser = factory.deleteOne(User, 'id');
+
+exports.patchUser = factory.patchOne(User, 'id');
+
+exports.deleteUser = factory.deleteOne(User, 'id');
 
 const updateMe = async (req, res, next) => {
   // required FIELDS to update
@@ -66,9 +66,6 @@ const deleteMe = async (req, res, next) => {
 
 ///// LOAD AND EXPORT HANDLERS /////
 exports.getAllUsers = catchAsync(getAllUsers);
-exports.createUser = catchAsync(createUser);
 exports.getUser = catchAsync(getUser);
-exports.patchUser = catchAsync(patchUser);
-exports.deleteUser = deleteUser;
 exports.updateMe = catchAsync(updateMe);
 exports.deleteMe = catchAsync(deleteMe);

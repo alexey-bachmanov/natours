@@ -15,7 +15,7 @@ exports.aliasTopTours = (req, res, next) => {
 };
 
 ///// HANDLERS /////
-const createTourHandler = factory.createOne(Tour);
+exports.createTour = factory.createOne(Tour);
 
 const getAllToursHandler = async (req, res, next) => {
   // build query
@@ -46,18 +46,9 @@ const getTourHandler = async (req, res, next) => {
   });
 };
 
-const patchTourHandler = async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.tourId, req.body, {
-    new: true,
-    runValidators: true,
-  });
-  res.status(200).json({
-    status: 'success',
-    data: { tour },
-  });
-};
+exports.patchTour = factory.patchOne(Tour, 'tourId');
 
-const deleteTourHandler = factory.deleteOne(Tour, 'tourId');
+exports.deleteTour = factory.deleteOne(Tour, 'tourId');
 
 const getTourStatsHandler = async (req, res, next) => {
   const stats = await Tour.aggregate([
@@ -142,10 +133,7 @@ const getMonthlyPlanHandler = async (req, res, next) => {
 // --calls catchAsync, which:
 // ----calls handler, which creates response or error
 // --errors are caught in .catch and passed to error-handling middleware in app.js
-exports.createTour = catchAsync(createTourHandler);
 exports.getAllTours = catchAsync(getAllToursHandler);
 exports.getTour = catchAsync(getTourHandler);
-exports.patchTour = catchAsync(patchTourHandler);
-exports.deleteTour = deleteTourHandler;
 exports.getTourStats = catchAsync(getTourStatsHandler);
 exports.getMonthlyPlan = catchAsync(getMonthlyPlanHandler);
