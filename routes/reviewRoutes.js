@@ -5,7 +5,7 @@ const authController = require('../controllers/authController');
 const router = express.Router({ mergeParams: true }); // pull params from tourRouter on redirect
 
 ///// MIDDLEWARE /////
-router.param('id', reviewController.checkID);
+// router.param('id', reviewController.checkID);
 
 ///// ROUTES /////
 router

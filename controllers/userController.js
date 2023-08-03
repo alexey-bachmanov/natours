@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const factory = require('./handlerFactory');
 
 ///// HELPER FUNCTIONS /////
 const filterObj = function (object, ...allowedFields) {
@@ -18,18 +19,14 @@ const getAllUsers = async (req, res, next) => {
   const users = await User.find();
   res.status(200).json({ status: 'success', data: { users: users } });
 };
-const createUser = async (req, res, next) => {
-  res.status(500).json({ status: 'error', message: 'route not yet defined' });
-};
+const createUser = factory.createOne(User);
 const getUser = async (req, res, next) => {
   res.status(500).json({ status: 'error', message: 'route not yet defined' });
 };
 const patchUser = async (req, res, next) => {
   res.status(500).json({ status: 'error', message: 'route not yet defined' });
 };
-const deleteUser = async (req, res, next) => {
-  res.status(500).json({ status: 'error', message: 'route not yet defined' });
-};
+const deleteUser = factory.deleteOne(User, 'id');
 
 const updateMe = async (req, res, next) => {
   // required FIELDS to update
@@ -72,6 +69,6 @@ exports.getAllUsers = catchAsync(getAllUsers);
 exports.createUser = catchAsync(createUser);
 exports.getUser = catchAsync(getUser);
 exports.patchUser = catchAsync(patchUser);
-exports.deleteUser = catchAsync(deleteUser);
+exports.deleteUser = deleteUser;
 exports.updateMe = catchAsync(updateMe);
 exports.deleteMe = catchAsync(deleteMe);

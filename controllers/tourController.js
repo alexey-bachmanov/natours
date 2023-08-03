@@ -3,6 +3,7 @@ const Tour = require('../models/tourModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const apiFeatures = require('../utils/apiFeatures');
+const factory = require('./handlerFactory');
 
 ///// MIDDLEWARE FUNCTIONS /////
 exports.aliasTopTours = (req, res, next) => {
@@ -13,34 +14,8 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-exports.checkID = async (req, res, next) => {
-  try {
-    // is the ID valid ?
-    if (!mongoose.isObjectIdOrHexString(req.params.tourId))
-      // call next() with an error in the args, so code skips to global error
-      // handling middleware in app.js
-      return next(new AppError('No tour found for that ID', 404));
-    // does a valid tour exist with that ID?
-    const tourExists = await Tour.exists({ _id: req.params.tourId });
-    if (!tourExists)
-      return next(new AppError('No tour found for that ID', 404));
-  } catch (error) {
-    next(error);
-  }
-  next();
-};
-
 ///// HANDLERS /////
-const createTourHandler = async (req, res, next) => {
-  // sanitize inputs
-  if (req.body._id) delete req.body._id;
-  if (req.body.id) delete req.body.id;
-  const newTour = await Tour.create(req.body);
-  res.status(201).json({
-    status: 'success',
-    data: { tour: newTour },
-  });
-};
+const createTourHandler = factory.createOne(Tour);
 
 const getAllToursHandler = async (req, res, next) => {
   // build query
@@ -82,13 +57,7 @@ const patchTourHandler = async (req, res, next) => {
   });
 };
 
-const deleteTourHandler = async (req, res, next) => {
-  await Tour.findByIdAndDelete(req.params.tourId);
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-};
+const deleteTourHandler = factory.deleteOne(Tour, 'tourId');
 
 const getTourStatsHandler = async (req, res, next) => {
   const stats = await Tour.aggregate([
@@ -177,6 +146,6 @@ exports.createTour = catchAsync(createTourHandler);
 exports.getAllTours = catchAsync(getAllToursHandler);
 exports.getTour = catchAsync(getTourHandler);
 exports.patchTour = catchAsync(patchTourHandler);
-exports.deleteTour = catchAsync(deleteTourHandler);
+exports.deleteTour = deleteTourHandler;
 exports.getTourStats = catchAsync(getTourStatsHandler);
 exports.getMonthlyPlan = catchAsync(getMonthlyPlanHandler);

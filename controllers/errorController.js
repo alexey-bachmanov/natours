@@ -38,6 +38,10 @@ const sendErrorProd = (err, res) => {
 };
 
 ///// SPECIFIC ERROR TYPE HANDLERS /////
+const handleCastErrorDB = (err) => {
+  const message = `Invalid ${err.path}: ${err.value}.`;
+  return new AppError(message, 400);
+};
 const handleDBValidationError = (err) => {
   return new AppError(err.message, 400);
 };
@@ -59,6 +63,7 @@ module.exports = (err, req, res, next) => {
   error.statusCode = err.statusCode || 500;
   error.status = err.status || 'internal server error';
 
+  if (error.kind === 'ObjectId') error = handleCastErrorDB(error);
   if (error._message && error._message.includes('validation failed'))
     error = handleDBValidationError(err);
   if (error.code === 11000) error = handleDBDuplicateError(err);
