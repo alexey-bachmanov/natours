@@ -43,9 +43,13 @@ const createReviewHandler = async (req, res, next) => {
 };
 
 const getAllReviewsHandler = async (req, res, next) => {
+  // check if this is a *specific* tour asking for its reviews
+  let tourFilter = {};
+  if (req.params.tourId) tourFilter = { tour: req.params.tourId };
+  console.log(tourFilter);
   // build query
   const queryObj = { ...req.query };
-  let query = Review.find();
+  let query = Review.find(tourFilter);
   // apply filter/sort operations
   query = apiFeatures.filter(query, queryObj);
   query = apiFeatures.sort(query, queryObj);
