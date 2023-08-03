@@ -64,7 +64,7 @@ const getAllToursHandler = async (req, res, next) => {
 };
 
 const getTourHandler = async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate('reviews');
+  const tour = await Tour.findById(req.params.tourId).populate('reviews');
   res.status(200).json({
     status: 'success',
     data: { tour },
@@ -72,7 +72,7 @@ const getTourHandler = async (req, res, next) => {
 };
 
 const patchTourHandler = async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+  const tour = await Tour.findByIdAndUpdate(req.params.tourId, req.body, {
     new: true,
     runValidators: true,
   });
@@ -83,7 +83,7 @@ const patchTourHandler = async (req, res, next) => {
 };
 
 const deleteTourHandler = async (req, res, next) => {
-  await Tour.findByIdAndDelete(req.params.id);
+  await Tour.findByIdAndDelete(req.params.tourId);
   res.status(204).json({
     status: 'success',
     data: null,

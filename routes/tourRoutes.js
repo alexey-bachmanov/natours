@@ -1,7 +1,7 @@
 const express = require('express');
 const tourController = require('../controllers/tourController');
-const reviewController = require('../controllers/reviewController');
 const authController = require('../controllers/authController');
+const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
 
@@ -13,6 +13,9 @@ router.param('tourId', tourController.checkID);
 // });
 
 ///// ROUTES /////
+// redirect for review routes
+router.use('/:tourId/reviews', reviewRouter);
+
 // alias route
 router
   .route('/top-5-cheap')
