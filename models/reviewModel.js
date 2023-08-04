@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Tour = require('./tourModel');
 
 ///// SCHEMA /////
 const reviewSchema = new mongoose.Schema(
@@ -42,6 +43,43 @@ reviewSchema.pre(/^find/, function (next) {
   });
   next();
 });
+
+reviewSchema.post('save', function () {
+  // call calcAverageRatings and retrieve stats
+  // this points to document
+  // this.constructor points to document's Model
+  // calcAverageRatings must be called on the model
+  this.constructor.calcAverageRatings(this.tour);
+});
+
+// ↓ works for findByIdAndUpdate & findByIdAndDelete
+reviewSchema.post(/^findOneAnd/, async function (doc, next) {
+  // this points to query, doc points to just found doc
+  await doc.constructor.calcAverageRatings(doc.tour);
+  next();
+});
+
+///// STATIC METHODS /////
+reviewSchema.statics.calcAverageRatings = async function (tourId) {
+  // re-calculate number and average of all reviews
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: '$tour',
+        numRatings: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+
+  await Tour.findByIdAndUpdate(tourId, {
+    ratingsAverage: stats[0].avgRating || 4.5,
+    ratingsQuantity: stats[0].numRatings || 0,
+  });
+};
 
 ///// MODEL /////
 const Review = mongoose.model('Review', reviewSchema);
