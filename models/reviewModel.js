@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Tour = require('./tourModel');
+const AppError = require('../utils/appError');
 
 ///// SCHEMA /////
 const reviewSchema = new mongoose.Schema(
@@ -55,6 +56,7 @@ reviewSchema.post('save', function () {
 // ↓ works for findByIdAndUpdate & findByIdAndDelete
 reviewSchema.post(/^findOneAnd/, async function (doc, next) {
   // this points to query, doc points to just found doc
+  if (!doc) return next(new AppError('No document found for that ID', 404));
   await doc.constructor.calcAverageRatings(doc.tour);
   next();
 });

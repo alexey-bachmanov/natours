@@ -1,35 +1,30 @@
 const AppError = require('../utils/appError');
 
 ///// PROD/DEV ERROR HANDLING /////
-const sendErrorDev = (err, res) => {
+const sendErrorDev = (originalError, appError, res) => {
   // similar to sendErrorProd, just including error information
-  if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-      error: err,
+  if (appError.isOperational) {
+    res.status(appError.statusCode).json({
+      status: appError.status,
+      message: appError.message,
+      error: originalError,
     });
   } else {
-    console.error(err);
+    console.error(originalError);
     res.status(500).json({
       status: 'error',
       message: 'internal server error',
-      error: err,
     });
   }
 };
-const sendErrorProd = (err, res) => {
-  if (err.isOperational) {
-    // error thrown with AppError, info should be forwarded
-    // to the client (404s, DB errors, invalid routes, etc)
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
+const sendErrorProd = (originalError, appError, res) => {
+  if (appError.isOperational) {
+    res.status(appError.statusCode).json({
+      status: appError.status,
+      message: appError.message,
     });
   } else {
-    // programming errors, info should be logged to the
-    // hosting platform and hidden from the user
-    console.error(err);
+    console.error(originalError);
     res.status(500).json({
       status: 'error',
       message: 'internal server error',
@@ -71,8 +66,8 @@ module.exports = (err, req, res, next) => {
   if (error.name === 'TokenExpiredError') error = handleJWTExpired(err);
 
   if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(error, res);
+    sendErrorDev(err, error, res);
   } else {
-    sendErrorProd(error, res);
+    sendErrorProd(err, error, res);
   }
 };
