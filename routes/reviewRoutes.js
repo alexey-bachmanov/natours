@@ -8,11 +8,12 @@ const router = express.Router({ mergeParams: true }); // pull params from tourRo
 // router.param('id', reviewController.checkID);
 
 ///// ROUTES /////
+// ↓ require authorization for everything below this point ↓
+router.use(authController.protect);
 router
   .route('/')
   .get(reviewController.getAllReviews)
   .post(
-    authController.protect,
     authController.restrictTo('user'),
     reviewController.setTourAndUserIds,
     reviewController.createReview
@@ -21,7 +22,13 @@ router
 router
   .route('/:id')
   .get(reviewController.getReview)
-  .patch(reviewController.patchReview)
-  .delete(reviewController.deleteReview);
+  .patch(
+    authController.restrictTo('user', 'admin'),
+    reviewController.patchReview
+  )
+  .delete(
+    authController.restrictTo('user', 'admin'),
+    reviewController.deleteReview
+  );
 
 module.exports = router;
