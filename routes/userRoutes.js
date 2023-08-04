@@ -11,6 +11,9 @@ router.route('/login').post(authController.login);
 
 // user updates by the user themselves
 router
+  .route('/me')
+  .get(authController.protect, userController.getMe, userController.getUser);
+router
   .route('/updateMyPassword')
   .patch(authController.protect, authController.updatePassword);
 router

@@ -1,8 +1,5 @@
-const mongoose = require('mongoose');
 const Tour = require('../models/tourModel');
-const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
-const apiFeatures = require('../utils/apiFeatures');
 const factory = require('./handlerFactory');
 
 ///// MIDDLEWARE FUNCTIONS /////
@@ -17,34 +14,9 @@ exports.aliasTopTours = (req, res, next) => {
 ///// HANDLERS /////
 exports.createTour = factory.createOne(Tour);
 
-const getAllToursHandler = async (req, res, next) => {
-  // build query
-  const queryObj = { ...req.query };
-  let query = Tour.find();
-  // apply filter/sort operations
-  query = apiFeatures.filter(query, queryObj);
-  query = apiFeatures.sort(query, queryObj);
-  query = apiFeatures.project(query, queryObj);
-  query = apiFeatures.paginate(query, queryObj);
-  // execute query
-  const tours = await query;
-  // if no errors occured, it's good practice to send a 200 response
-  // regardless of whether there are any valid results to send back
-  // idk, standard practice 🤷‍♂️
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: { tours },
-  });
-};
+exports.getAllTours = factory.getAll(Tour);
 
-const getTourHandler = async (req, res, next) => {
-  const tour = await Tour.findById(req.params.tourId).populate('reviews');
-  res.status(200).json({
-    status: 'success',
-    data: { tour },
-  });
-};
+exports.getTour = factory.getOne(Tour, 'tourId', { path: 'reviews' });
 
 exports.patchTour = factory.patchOne(Tour, 'tourId');
 
@@ -133,7 +105,5 @@ const getMonthlyPlanHandler = async (req, res, next) => {
 // --calls catchAsync, which:
 // ----calls handler, which creates response or error
 // --errors are caught in .catch and passed to error-handling middleware in app.js
-exports.getAllTours = catchAsync(getAllToursHandler);
-exports.getTour = catchAsync(getTourHandler);
 exports.getTourStats = catchAsync(getTourStatsHandler);
 exports.getMonthlyPlan = catchAsync(getMonthlyPlanHandler);

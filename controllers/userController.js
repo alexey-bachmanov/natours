@@ -13,19 +13,17 @@ const filterObj = function (object, ...allowedFields) {
   });
   return filteredObject;
 };
+///// MIDDLEWARE /////
+const getMe = (req, res, next) => {
+  // hack-y middleware allowing the /me endpoint to work
+  req.params.id = req.user.id;
+  next();
+};
 
 ///// HANDLERS /////
-const getAllUsers = async (req, res, next) => {
-  const users = await User.find();
-  res.status(200).json({ status: 'success', data: { users: users } });
-};
-
-const getUser = async (req, res, next) => {
-  res.status(500).json({ status: 'error', message: 'route not yet defined' });
-};
-
+exports.getAllUsers = factory.getAll(User);
+exports.getUser = factory.getOne(User, 'id');
 exports.patchUser = factory.patchOne(User, 'id');
-
 exports.deleteUser = factory.deleteOne(User, 'id');
 
 const updateMe = async (req, res, next) => {
@@ -65,7 +63,6 @@ const deleteMe = async (req, res, next) => {
 };
 
 ///// LOAD AND EXPORT HANDLERS /////
-exports.getAllUsers = catchAsync(getAllUsers);
-exports.getUser = catchAsync(getUser);
+exports.getMe = getMe;
 exports.updateMe = catchAsync(updateMe);
 exports.deleteMe = catchAsync(deleteMe);
