@@ -45,6 +45,9 @@ const handleDBDuplicateError = (err) => {
   const message = `Entry with value: ${fieldVal} already exists`;
   return new AppError(message, 400);
 };
+const handleDuplicateReviewError = (err) => {
+  return new AppError("User can't review a tour more than once", 400);
+};
 const handleJWTInvalid = (err) => {
   return new AppError('Invalid login credentials', 401);
 };
@@ -58,12 +61,31 @@ module.exports = (err, req, res, next) => {
   error.statusCode = err.statusCode || 500;
   error.status = err.status || 'internal server error';
 
-  if (error.kind === 'ObjectId') error = handleCastErrorDB(error);
+  // incorrect ObjectId
+  if (error.kind === 'ObjectId') error = handleCastErrorDB(err);
+
+  // validation failure
   if (error._message && error._message.includes('validation failed'))
     error = handleDBValidationError(err);
-  if (error.code === 11000) error = handleDBDuplicateError(err);
-  if (error.name === 'JsonWebTokenError') error = handleJWTInvalid(err);
-  if (error.name === 'TokenExpiredError') error = handleJWTExpired(err);
+
+  // duplicate reviews on the same tour by one user
+  if (
+    err.code === 11000 &&
+    err.keyPattern.tour === 1 &&
+    err.keyPattern.user === 1
+  )
+    error = handleDuplicateReviewError(err);
+
+  // duplicate unique entries
+  if (
+    err.code === 11000 &&
+    err.keyPattern.tour !== 1 &&
+    err.keyPattern.user !== 1
+  )
+    error = handleDBDuplicateError(err);
+
+  if (err.name === 'JsonWebTokenError') error = handleJWTInvalid(err);
+  if (err.name === 'TokenExpiredError') error = handleJWTExpired(err);
 
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, error, res);

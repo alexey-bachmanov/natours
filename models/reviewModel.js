@@ -34,6 +34,8 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+///// INDICES /////
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 
 ///// MIDDLEWARE /////
 // populate user data on query
@@ -77,10 +79,17 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
     },
   ]);
 
-  await Tour.findByIdAndUpdate(tourId, {
-    ratingsAverage: stats[0].avgRating || 4.5,
-    ratingsQuantity: stats[0].numRatings || 0,
-  });
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsAverage: stats[0].avgRating,
+      ratingsQuantity: stats[0].numRatings,
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsAverage: 4.5,
+      ratingsQuantity: 0,
+    });
+  }
 };
 
 ///// MODEL /////

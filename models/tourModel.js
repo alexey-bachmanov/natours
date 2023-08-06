@@ -9,6 +9,7 @@ const tourSchema = new mongoose.Schema(
       default: 4.5,
       max: [5, 'rating must be between 1 and 5'],
       min: [1, 'rating must be between 1 and 5'],
+      set: (val) => 0.1 * Math.round(10 * val), // round to the nearest 0.1
     },
     ratingsQuantity: { type: Number, default: 0 },
     images: [String],
