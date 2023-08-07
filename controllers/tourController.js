@@ -120,6 +120,9 @@ const getToursWithinHandler = async (req, res, next) => {
   // so radius(rad) = distance(mi) / Rearth(mi)
   // mongoDB also needs a '2dsphere' index for geospatial queries
   const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+  // lat & lng is common input schema
+  // lng & lat is geoJSON schema - it's reversed
+  // don't forget this time!
   const tours = await Tour.find({
     startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
   });
@@ -131,6 +134,50 @@ const getToursWithinHandler = async (req, res, next) => {
   });
 };
 
+const getTourDistancesHandler = async (req, res, next) => {
+  const { latlng, unit } = req.params;
+  if (!latlng || !unit)
+    return next(
+      new AppError('Please provide a center and unit parameter', 400)
+    );
+  const [lat, lng] = latlng.split(',');
+  if (!lat || !lng)
+    return next(
+      new AppError(
+        'Please provide a latitude and longitude in the form of lat,lng',
+        400
+      )
+    );
+
+  const distances = await Tour.aggregate([
+    // geoNear is the only existing geospatial aggregation step
+    // geoNear must be the first step in the aggregation pipeline
+    // geoNear needs a geospatial 2dSphere index to work with
+    // geoNear returns resulting distances in meters
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [lng * 1, lat * 1],
+        },
+        distanceField: 'distance',
+        distanceMultiplier: req.params.unit === 'mi' ? 0.000621371 : 0.001,
+      },
+    },
+    {
+      $project: {
+        distance: 1,
+        name: 1,
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: { distances },
+  });
+};
+
 ///// LOAD AND EXPORT HANDLERS /////
 // createTour called, which:
 // --calls catchAsync, which:
@@ -139,3 +186,4 @@ const getToursWithinHandler = async (req, res, next) => {
 exports.getTourStats = catchAsync(getTourStatsHandler);
 exports.getMonthlyPlan = catchAsync(getMonthlyPlanHandler);
 exports.getToursWithin = catchAsync(getToursWithinHandler);
+exports.getDistances = catchAsync(getTourDistancesHandler);
