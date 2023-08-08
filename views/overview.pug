@@ -1,6 +1,11 @@
 //- extending the base template means injecting some
 //- content into a "layout" template
+
+//- imports tours array
 extends base
 
 block content 
-  h1 This is the tour overview
+  main 
+    .card-container
+      each tour in tours
+        include _tourCard

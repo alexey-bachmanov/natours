@@ -2,34 +2,52 @@
 //- pug will also accept regular html written inside it
 
 //- basic usage:
-//- h1 Example → <h1>Example</h1>
+//-   h1 Example → <h1>Example</h1>
 
 //- class names
-//- nav.class1.class2.class3 → <nav class="class1 class2 class3">...</nav>
+//-   nav.class1.class2 → <nav class="class1 class2">...</nav>
+//-   nav.fixed-class(class=`variable-class-${i}`) → <nav class="fixed-class variable-class-x">
 //- divs disappear by default
-//- .class1 Content → <div class="class1">Content</div>
+//-   .class1 Content → <div class="class1">Content</div>
 
 //- use with variables:
-//- app.js: res.status(200).render('base', {user: 'John'})
-//- base.pug: h1= user → <h1>John</h1>
+//-   app.js: res.status(200).render('base', {user: 'John'})
+//-   base.pug: h1= user → <h1>John</h1>
 
 //- use with js code:
-//- h1= user.toUpperCase() → <h1>JOHN</h1> (buffered code)
+//-   h1= user.toUpperCase() → <h1>JOHN</h1> (buffered code)
 
 //- unbuffered code (code that isn't rendered):
-//- - const x = 9 (unbuffered)
-//- h1= x → <h1>9</h1> (buffered again)
+//-   - const x = 9 (unbuffered)
+//-   h1= x → <h1>9</h1> (buffered again)
 
 //- interpolation, kinda like template literals:
-//- h1 #{user} has logged in → <h1>John has logged in</h1>
+//-   h1 #{user} has logged in → <h1>John has logged in</h1>
+
+//- loops:
+//-   each [element] in [array]
+//-     li [element]
+
+//- if statements
+//-   - if (foo === 'bar')
+//-     ...pug code...
+//-   
+
+//- mixins:
+//- defined usu near the top of the code
+//-   mixin exampleMixin(arg0,arg1)
+//-     span #{arg0} or #{arg1}
+//- executed in the body of the pug code
+//-   +mixin('cake','death')
+
 
 doctype html
 html
   head 
     meta(charset='UTF-8' )
     meta(name='viewport' content='width=device-width, initial-scale=1.0')
-    link(rel='stylesheet' href='css/style.css')
-    link(rel='shortcut icon' type='image/png' href='img/favicon.png')
+    link(rel='stylesheet' href='/css/style.css')
+    link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
     link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
     title Natours | #{title}
 
