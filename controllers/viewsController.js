@@ -22,7 +22,7 @@ const getTourHandler = async (req, res, next) => {
   // build template
 
   // render that template using tour data
-  res.status(200).render('tour', { tour });
+  res.status(200).render('tour', { title: `${tour.name} Tour`, tour });
   // res.status(200).json(tour);
 };
 

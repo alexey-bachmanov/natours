@@ -34,22 +34,51 @@
 //-   
 
 //- mixins:
-//- defined usu near the top of the code
+//- defined near the top of the code
 //-   mixin exampleMixin(arg0,arg1)
 //-     span #{arg0} or #{arg1}
 //- executed in the body of the pug code
-//-   +mixin('cake','death')
+//-   +exampleMixin('cake','death')
 
+//- importing and includes:
+//- snippets of pug code can be split off and imported into the main document
+//- include _fileName
+
+//- blocks and extending:
+//- blocks define a section of code that can be modified by other files
+//- so basically, importing but reversed
+//- when childFile.pug is loaded, averything from base.pug will be
+//- imported, and base's blockName will be replaced by childFile's
+//- base.pug:
+//-   block blockName
+//-     ...original pug code...
+//- childFile.pug:
+//-   extends base
+//-   block blockName
+//-     ...replacement pug code...
+
+//- append and prepend:
+//- instead of replacing a block, content can be added before or after original
+//- block's content.
+//- useful for modifying the head of an html document without breaking anything
+//- base.pug:
+//-   block blockName
+//-     ...original pug code...
+//- childFile.pug:
+//-   extends base
+//-   block append blockName
+//-     ...appended pug code...
 
 doctype html
 html
   head 
-    meta(charset='UTF-8' )
-    meta(name='viewport' content='width=device-width, initial-scale=1.0')
-    link(rel='stylesheet' href='/css/style.css')
-    link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
-    link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
-    title Natours | #{title}
+    block head
+      meta(charset='UTF-8' )
+      meta(name='viewport' content='width=device-width, initial-scale=1.0')
+      link(rel='stylesheet' href='/css/style.css')
+      link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
+      link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
+      title Natours | #{title || 'Find your next adventure'}
 
   body
     // header
