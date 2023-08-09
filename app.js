@@ -7,6 +7,8 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xssClean = require('./utils/xssCleaner');
 const hpp = require('hpp');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const AppError = require('./utils/appError');
 const globalErrorController = require('./controllers/errorController');
@@ -29,13 +31,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 ///// GLOBAL MIDDLEWARES /////
 // set security HTTP headers with helmet:
-const scriptSrcUrls = ['https://unpkg.com/', 'https://tile.openstreetmap.org'];
+const scriptSrcUrls = [
+  'https://unpkg.com/',
+  'https://tile.openstreetmap.org',
+  'https://cdnjs.cloudflare.com',
+];
 const styleSrcUrls = [
   'https://unpkg.com/',
   'https://tile.openstreetmap.org',
   'https://fonts.googleapis.com/',
 ];
-const connectSrcUrls = ['https://unpkg.com', 'https://tile.openstreetmap.org'];
+const connectSrcUrls = [
+  'https://unpkg.com',
+  'https://tile.openstreetmap.org',
+  'https://cdnjs.cloudflare.com',
+];
 const fontSrcUrls = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 app.use(
   helmet.contentSecurityPolicy({
@@ -51,6 +61,8 @@ app.use(
     },
   })
 );
+// set up CORS
+app.use(cors());
 // rate limit:
 const limiter = rateLimit({
   max: 100,
@@ -58,8 +70,9 @@ const limiter = rateLimit({
   message: 'Too many requests from this address',
 });
 app.use('/api', limiter);
-// parse body data into req.body:
+// parse body and cookie data into req.body:
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 // sanitize data against NoSQL query injection and XSS (cross-site scripting) attacks:
 app.use(mongoSanitize());
 app.use(xssClean());
@@ -78,6 +91,12 @@ app.use(
 );
 // development logging:
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
+
+///// TEST MIDDLEWARE /////
+// app.use((req, res, next) => {
+//   console.log(req.cookies);
+//   next();
+// });
 
 ///// ROUTES /////
 // mount routers

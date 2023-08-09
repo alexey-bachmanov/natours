@@ -41,21 +41,31 @@ const createSendToken = function (user, statusCode, res) {
 ///// MIDDLEWARE /////
 const protect = async (req, res, next) => {
   // get token / check if it exists
+  let token;
   if (
-    !req.headers.authorization ||
-    !req.headers.authorization.startsWith('Bearer')
-  )
-    return next(new AppError('Invalid authorization header', 400));
-  const token = req.headers.authorization.split(' ')[1];
-  if (!token) return next(new AppError('Invalid token', 401));
+    // if authorization is happening with a header
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    // if authorization is happening with a cookie
+    token = req.cookies.jwt;
+  }
+
+  if (!token) return next(new AppError('Invalid authorization token', 401));
+
   // verify token
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
   // check if user still exists
   const user = await User.findById(decoded.id).select('+password');
   if (!user) return next(new AppError('User no longer exists', 401));
+
   // check if user changed passwords after token was issued
   if (user.passwordChangedAfter(decoded.iat))
     return next(new AppError('Token invalid: password changed', 401));
+
   // grant acess to protected route
   req.user = user;
   next();
