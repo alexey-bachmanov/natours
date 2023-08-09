@@ -71,6 +71,30 @@ const protect = async (req, res, next) => {
   next();
 };
 
+const isLoggedIn = async (req, res, next) => {
+  // only exists to pull user from auth token,
+  // for conditionally rendered elements on pages
+  // get token / check if it exists
+  let token;
+  if (req.cookies.jwt) token = req.cookies.jwt;
+  if (!token) return next();
+
+  // verify token
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+  // check if user still exists
+  const user = await User.findById(decoded.id);
+  if (!user) return next();
+
+  // check if user changed passwords after token was issued
+  if (user.passwordChangedAfter(decoded.iat)) return next();
+
+  // if you made it to this point, there is a valid logged-in user
+  // put the user into res.locals (so pug can access it)
+  res.locals.user = user;
+  next();
+};
+
 const restrictTo = (...requiredRoles) => {
   // requiredRoles = ['user','admin']
   return (req, res, next) => {
@@ -209,3 +233,4 @@ exports.restrictTo = restrictTo;
 exports.forgotPassword = catchAsync(forgotPassword);
 exports.resetPassword = catchAsync(resetPassword);
 exports.updatePassword = catchAsync(updatePassword);
+exports.isLoggedIn = isLoggedIn;
