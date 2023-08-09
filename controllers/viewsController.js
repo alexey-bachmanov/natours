@@ -5,9 +5,6 @@ const catchAsync = require('../utils/catchAsync');
 const getOverviewHandler = async (req, res, next) => {
   // get tour data from collection
   const tours = await Tour.find();
-
-  // build template
-
   // render that template using tour data
   res.status(200).render('overview', { tours });
 };
@@ -18,14 +15,16 @@ const getTourHandler = async (req, res, next) => {
     path: 'reviews',
     fields: 'review rating user',
   });
-
-  // build template
-
   // render that template using tour data
   res.status(200).render('tour', { title: `${tour.name} Tour`, tour });
   // res.status(200).json(tour);
 };
 
+const getLoginFormHandler = async (req, res, next) => {
+  res.status(200).render('login', { title: 'Log in' });
+};
+
 ///// LOAD AND EXPORT HANDLERS /////
 exports.getOverview = catchAsync(getOverviewHandler);
 exports.getTour = catchAsync(getTourHandler);
+exports.getLoginForm = catchAsync(getLoginFormHandler);
