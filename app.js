@@ -45,6 +45,7 @@ const connectSrcUrls = [
   'https://unpkg.com',
   'https://tile.openstreetmap.org',
   'https://cdnjs.cloudflare.com',
+  'ws://localhost:8080', // for parcel websocket
 ];
 const fontSrcUrls = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 app.use(
