@@ -35,3 +35,7 @@ config.env
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# parcel cache
+.cache
+.parcel-cache

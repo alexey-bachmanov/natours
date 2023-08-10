@@ -3,9 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
+  "targets": {
+    "main": false
+  },
   "scripts": {
     "start": "nodemon server.js",
-    "debug": "ndb server.js"
+    "debug": "ndb server.js",
+    "watch:js": "parcel serve ./public/js/index.js --dist-dir ./public/js/bundled",
+    "build": "parcel build ./public/js/index.js --dist-dir ./public/js/bundled"
   },
   "author": "",
   "license": "MIT",
@@ -27,5 +32,8 @@
     "slugify": "^1.6.6",
     "validator": "^13.9.0",
     "xss": "^1.0.14"
+  },
+  "devDependencies": {
+    "parcel": "^2.9.3"
   }
 }
