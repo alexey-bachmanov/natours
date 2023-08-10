@@ -140,6 +140,19 @@ const login = async (req, res, next) => {
   createSendToken(user, 200, res);
 };
 
+const logout = async (req, res, next) => {
+  // send an empty cookie that will expire quickly to replace our login cookie
+  const cookieOptions = {
+    expires: new Date(Date.now() - 1000), // expires 1s in the past
+    httpOnly: true, // seal so can't be accessed or modified by the browser
+  };
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true; // only send over HTTPS
+  res.cookie('jwt', '', cookieOptions);
+  res.status(200).json({
+    status: 'success',
+  });
+};
+
 const forgotPassword = async (req, res, next) => {
   // requires EMAIL
   // sends RESET TOKEN to user's email
@@ -228,6 +241,7 @@ const updatePassword = async (req, res, next) => {
 ///// LOAD AND EXPORT HANDLERS /////
 exports.signup = catchAsync(signup);
 exports.login = catchAsync(login);
+exports.logout = catchAsync(logout);
 exports.protect = catchAsync(protect);
 exports.restrictTo = restrictTo;
 exports.forgotPassword = catchAsync(forgotPassword);

@@ -8,6 +8,7 @@ const router = express.Router();
 // user creation (special, non-RESTful routes)
 router.route('/signup').post(authController.signup);
 router.route('/login').post(authController.login);
+router.route('/logout').get(authController.logout);
 
 // 'forgot my password' routes
 router.route('/forgotPassword').post(authController.forgotPassword);

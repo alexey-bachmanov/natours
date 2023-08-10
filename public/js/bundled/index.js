@@ -578,17 +578,21 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 // import 'regenerator-runtime/runtime';
 var _login = require("./login");
 var _leaflet = require("./leaflet");
+///// DOM ELEMENTS /////
+const loginForm = document.querySelector(".form");
+const logoutBtn = document.querySelector(".nav__el--logout");
+const leafletMap = document.getElementById("map");
 ///// LOGIN CODE /////
-document.querySelector(".form")?.addEventListener("submit", (e)=>{
+if (loginForm) loginForm.addEventListener("submit", (e)=>{
     e.preventDefault();
     // pull email and password
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     (0, _login.login)(email, password);
 });
+if (logoutBtn) logoutBtn.addEventListener("click", (0, _login.logout));
 ///// MAP CODE /////
 // imports data from #map
-const leafletMap = document.getElementById("map");
 if (leafletMap) {
     const locations = JSON.parse(leafletMap.dataset.locations);
     (0, _leaflet.displayMap)(locations);
@@ -598,6 +602,7 @@ if (leafletMap) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "login", ()=>login);
+parcelHelpers.export(exports, "logout", ()=>logout);
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
 var _alerts = require("./alerts");
@@ -620,6 +625,18 @@ const login = async (email, password)=>{
         }
     } catch (err) {
         (0, _alerts.showAlert)("error", err.response.data.message);
+    }
+};
+const logout = async ()=>{
+    try {
+        const res = await (0, _axiosDefault.default)({
+            method: "GET",
+            url: "http://localhost:3000/api/v1/users/logout"
+        });
+        // if request went through, force reload of the page
+        if (res.data.status === "success") location.reload(true);
+    } catch (err) {
+        (0, _alerts.showAlert)("error", "Error logging out");
     }
 };
 
