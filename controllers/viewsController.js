@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 ///// HANDLERS /////
 const getOverviewHandler = async (req, res, next) => {
@@ -15,6 +16,8 @@ const getTourHandler = async (req, res, next) => {
     path: 'reviews',
     fields: 'review rating user',
   });
+  // handle no tour found
+  if (!tour) return next(new AppError('Tour not found', 404));
   // render that template using tour data
   res.status(200).render('tour', { title: `${tour.name} Tour`, tour });
   // res.status(200).json(tour);

@@ -1,35 +1,16 @@
 const AppError = require('../utils/appError');
 
-///// PROD/DEV ERROR HANDLING /////
-const sendErrorDev = (originalError, appError, res) => {
-  // similar to sendErrorProd, just including error information
-  if (appError.isOperational) {
-    res.status(appError.statusCode).json({
-      status: appError.status,
-      message: appError.message,
-      error: originalError,
-    });
-  } else {
-    console.error(originalError);
-    res.status(500).json({
-      status: 'error',
-      message: 'internal server error',
-    });
-  }
+///// RENDER / JSON ERROR RESPONSE /////
+const sendErrorJson = (appError, res) => {
+  // send a json with some general information, but no internal server data
+  res.status(appError.statusCode).json({
+    status: appError.status,
+    message: appError.message,
+  });
 };
-const sendErrorProd = (originalError, appError, res) => {
-  if (appError.isOperational) {
-    res.status(appError.statusCode).json({
-      status: appError.status,
-      message: appError.message,
-    });
-  } else {
-    console.error(originalError);
-    res.status(500).json({
-      status: 'error',
-      message: 'internal server error',
-    });
-  }
+
+const sendErrorPage = (appError, res) => {
+  res.status(appError.statusCode).render('error', { error: appError });
 };
 
 ///// SPECIFIC ERROR TYPE HANDLERS /////
@@ -60,6 +41,9 @@ module.exports = (err, req, res, next) => {
   let error = { ...err };
   error.statusCode = err.statusCode || 500;
   error.status = err.status || 'internal server error';
+  error.message = err.message;
+
+  // call specific error type handlers:
 
   // incorrect ObjectId
   if (error.kind === 'ObjectId') error = handleCastErrorDB(err);
@@ -84,12 +68,28 @@ module.exports = (err, req, res, next) => {
   )
     error = handleDBDuplicateError(err);
 
+  // JSON web token errors
   if (err.name === 'JsonWebTokenError') error = handleJWTInvalid(err);
   if (err.name === 'TokenExpiredError') error = handleJWTExpired(err);
 
-  if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(err, error, res);
-  } else {
-    sendErrorProd(err, error, res);
+  // figure out what kind of response to send:
+
+  if (error.isOperational && req.originalUrl.startsWith('/api')) {
+    // send an operational error json
+    sendErrorJson(error, res);
+  }
+  if (!error.isOperational && req.originalUrl.startsWith('/api')) {
+    // send a programming error json, & log error to server console
+    console.error(err);
+    sendErrorJson(error, res);
+  }
+  if (error.isOperational && !req.originalUrl.startsWith('/api')) {
+    // send a rendered 404 page
+    sendErrorPage(error, res);
+  }
+  if (!error.isOperational && !req.originalUrl.startsWith('/api')) {
+    // send a rendered 500 page, & log error to server console
+    console.error(err);
+    sendErrorPage(error, res);
   }
 };
