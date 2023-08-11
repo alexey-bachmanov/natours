@@ -584,8 +584,10 @@ const loginForm = document.getElementById("login-form");
 const logoutBtn = document.querySelector(".nav__el--logout");
 const leafletMap = document.getElementById("map");
 const userDataForm = document.querySelector(".form-user-data");
+const userPasswordForm = document.querySelector(".form-user-password");
 ///// LOGIN CODE /////
-if (loginForm) loginForm.addEventListener("submit", (e)=>{
+if (loginForm) // you're on the login page
+loginForm.addEventListener("submit", (e)=>{
     e.preventDefault();
     // pull email and password
     const email = document.getElementById("email").value;
@@ -595,17 +597,45 @@ if (loginForm) loginForm.addEventListener("submit", (e)=>{
 if (logoutBtn) logoutBtn.addEventListener("click", (0, _login.logout));
 ///// MAP CODE /////
 if (leafletMap) {
+    // you're on the tour details page
     // imports data from #map
     const locations = JSON.parse(leafletMap.dataset.locations);
     (0, _leaflet.displayMap)(locations);
 }
 ///// USER DATA UPDATE CODE /////
-if (userDataForm) userDataForm.addEventListener("submit", (e)=>{
-    e.preventDefault();
-    const userName = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    (0, _updateSettings.updateData)(userName, email);
-});
+if (userDataForm) {
+    // you're on the user data page
+    userDataForm.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        const userName = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        (0, _updateSettings.updateSettings)({
+            userName,
+            email
+        }, "data");
+    });
+    userPasswordForm.addEventListener("submit", async (e)=>{
+        e.preventDefault();
+        // pull entered password data
+        const password = document.getElementById("password-current").value;
+        const passwordNew = document.getElementById("password").value;
+        const passwordConfirm = document.getElementById("password-confirm").value;
+        // set button text to 'Updating...'
+        document.getElementById("button-save-password").textContent = "Updating...";
+        // send the password change request
+        await (0, _updateSettings.updateSettings)({
+            password,
+            passwordNew,
+            passwordConfirm
+        }, "password");
+        // clear the password fields
+        document.getElementById("password-current").value = "";
+        document.getElementById("password").value = "";
+        document.getElementById("password-confirm").value = "";
+        // reset button to 'Save password' again
+        document.getElementById("button-save-password").textContent = "Save password";
+    });
+}
 
 },{"./login":"7yHem","./leaflet":"xvuTT","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./updateSettings":"l3cGY"}],"7yHem":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -615,11 +645,12 @@ parcelHelpers.export(exports, "logout", ()=>logout);
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
 var _alerts = require("./alerts");
+const HOSTNAME = "http://localhost:3000";
 const login = async (email, password)=>{
     try {
         const res = await (0, _axiosDefault.default)({
             method: "POST",
-            url: "http://localhost:3000/api/v1/users/login",
+            url: `${HOSTNAME}/api/v1/users/login`,
             data: {
                 email,
                 password
@@ -640,7 +671,7 @@ const logout = async ()=>{
     try {
         const res = await (0, _axiosDefault.default)({
             method: "GET",
-            url: "http://localhost:3000/api/v1/users/logout"
+            url: `${HOSTNAME}/api/v1/users/logout`
         });
         // if request went through, force reload of the page
         if (res.data.status === "success") location.reload(true);
@@ -7061,21 +7092,21 @@ try {
 },{}],"l3cGY":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "updateData", ()=>updateData);
+parcelHelpers.export(exports, "updateSettings", ()=>updateSettings);
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
 var _alerts = require("./alerts");
-const updateData = async (userName, email)=>{
+const HOSTNAME = "http://localhost:3000";
+const updateSettings = async (data, type)=>{
+    // type is either 'data' for userName and email, or 'password' for password
     try {
+        const url = type === "password" ? `${HOSTNAME}/api/v1/users/updateMyPassword` : `${HOSTNAME}/api/v1/users/updateMe`;
         const res = await (0, _axiosDefault.default)({
             method: "PATCH",
-            url: "http://localhost:3000/api/v1/users/updateMe",
-            data: {
-                userName,
-                email
-            }
+            url,
+            data
         });
-        if (res.data.status === "success") (0, _alerts.showAlert)("success", "User data updated successfully");
+        if (res.data.status === "success") (0, _alerts.showAlert)("success", `Successfully updated ${type}`);
     } catch (err) {
         (0, _alerts.showAlert)("error", err.response.data.message); //.response?.data.message);
     }
