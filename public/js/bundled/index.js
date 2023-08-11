@@ -579,7 +579,7 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 var _login = require("./login");
 var _leaflet = require("./leaflet");
 ///// DOM ELEMENTS /////
-const loginForm = document.querySelector(".form");
+const loginForm = document.getElementById("login-form");
 const logoutBtn = document.querySelector(".nav__el--logout");
 const leafletMap = document.getElementById("map");
 ///// LOGIN CODE /////

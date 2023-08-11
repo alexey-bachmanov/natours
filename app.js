@@ -71,8 +71,9 @@ const limiter = rateLimit({
   message: 'Too many requests from this address',
 });
 app.use('/api', limiter);
-// parse body and cookie data into req.body:
+// parse body, form, and cookie data into req.body:
 app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 // sanitize data against NoSQL query injection and XSS (cross-site scripting) attacks:
 app.use(mongoSanitize());

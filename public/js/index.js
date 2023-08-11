@@ -5,7 +5,7 @@ import { login, logout } from './login';
 import { displayMap } from './leaflet';
 
 ///// DOM ELEMENTS /////
-const loginForm = document.querySelector('.form');
+const loginForm = document.getElementById('login-form');
 const logoutBtn = document.querySelector('.nav__el--logout');
 const leafletMap = document.getElementById('map');
 
