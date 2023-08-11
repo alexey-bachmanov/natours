@@ -27,7 +27,12 @@ const getLoginFormHandler = async (req, res, next) => {
   res.status(200).render('login', { title: 'Log in' });
 };
 
+const getAccountHandler = (req, res, next) => {
+  res.status(200).render('account', { title: 'My account' });
+};
+
 ///// LOAD AND EXPORT HANDLERS /////
 exports.getOverview = catchAsync(getOverviewHandler);
 exports.getTour = catchAsync(getTourHandler);
 exports.getLoginForm = catchAsync(getLoginFormHandler);
+exports.getAccount = getAccountHandler;

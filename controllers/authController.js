@@ -68,6 +68,8 @@ const protect = async (req, res, next) => {
 
   // grant acess to protected route
   req.user = user;
+  // put the user into res.locals (so pug can access it)
+  res.locals.user = user;
   next();
 };
 
