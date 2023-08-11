@@ -31,24 +31,24 @@ const getAccountHandler = (req, res, next) => {
   res.status(200).render('account', { title: 'My account' });
 };
 
-const updateUserDataHandler = async (req, res, next) => {
-  const updatedUser = await User.findByIdAndUpdate(
-    req.user._id,
-    {
-      userName: req.body.userName,
-      email: req.body.email,
-    },
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
-  res.status(200).render('account', { title: 'My account', user: updatedUser });
-};
+// const updateUserDataHandler = async (req, res, next) => {
+//   const updatedUser = await User.findByIdAndUpdate(
+//     req.user._id,
+//     {
+//       userName: req.body.userName,
+//       email: req.body.email,
+//     },
+//     {
+//       new: true,
+//       runValidators: true,
+//     }
+//   );
+//   res.status(200).render('account', { title: 'My account', user: updatedUser });
+// };
 
 ///// LOAD AND EXPORT HANDLERS /////
 exports.getOverview = catchAsync(getOverviewHandler);
 exports.getTour = catchAsync(getTourHandler);
 exports.getLoginForm = catchAsync(getLoginFormHandler);
 exports.getAccount = getAccountHandler;
-exports.updateUserData = catchAsync(updateUserDataHandler);
+// exports.updateUserData = catchAsync(updateUserDataHandler);

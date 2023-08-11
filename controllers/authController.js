@@ -66,10 +66,10 @@ const protect = async (req, res, next) => {
   if (user.passwordChangedAfter(decoded.iat))
     return next(new AppError('Token invalid: password changed', 401));
 
-  // grant acess to protected route
-  req.user = user;
   // put the user into res.locals (so pug can access it)
   res.locals.user = user;
+  // grant acess to protected route
+  req.user = user;
   next();
 };
 

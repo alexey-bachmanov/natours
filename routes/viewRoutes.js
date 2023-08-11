@@ -11,10 +11,10 @@ router.get('/login', authController.isLoggedIn, viewsController.getLoginForm);
 router.route('/me').get(authController.protect, viewsController.getAccount);
 
 // user update form submission
-router.post(
-  '/submit-user-data',
-  authController.protect,
-  viewsController.updateUserData
-);
+// router.post(
+//   '/submit-user-data',
+//   authController.protect,
+//   viewsController.updateUserData
+// );
 
 module.exports = router;
