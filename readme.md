@@ -2,7 +2,7 @@
 
 API and server-side rendering under construction...
 
-This is the final project for a Node.js course from [Jonas Schmedtmann](https://codingheroes.io/)
+This is the final project for a Node.js course.
 
 ## Technologies used
 
