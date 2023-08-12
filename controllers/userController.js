@@ -1,7 +1,39 @@
+const multer = require('multer');
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
+
+///// MULTER SETUP /////
+// set up storage
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/users');
+  },
+  filename: (req, file, cb) => {
+    // store as user-{userID}-{timestamp}.jpeg
+    const ext = file.mimetype.split('/')[1]; // 'img/jpeg' → 'jpeg'
+    cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+  },
+});
+
+// set up multer filter
+// is the uploaded file an image? if so pass true into cb()
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(true);
+  } else {
+    cb(new AppError('Not an image. Please only upload images.', 400), false);
+  }
+};
+
+// configure image upload with multer - set up directory where
+// file uploads will be saved
+const upload = multer({
+  dest: 'public/img/users',
+  storage: multerStorage,
+  filter: multerFilter,
+});
 
 ///// HELPER FUNCTIONS /////
 const filterObj = function (object, ...allowedFields) {
@@ -13,12 +45,17 @@ const filterObj = function (object, ...allowedFields) {
   });
   return filteredObject;
 };
+
 ///// MIDDLEWARE /////
 const getMe = (req, res, next) => {
   // hack-y middleware allowing the /me endpoint to work
   req.params.id = req.user.id;
   next();
 };
+
+// upload.single processes image uploads. it parses incoming formdata
+// with included images, and attatches info to req.file
+const uploadUserPhoto = upload.single('photo');
 
 ///// HANDLERS /////
 exports.getAllUsers = factory.getAll(User);
@@ -27,6 +64,8 @@ exports.patchUser = factory.patchOne(User, 'id');
 exports.deleteUser = factory.deleteOne(User, 'id');
 
 const updateMe = async (req, res, next) => {
+  console.log(req.file);
+  console.log(req.body);
   // required FIELDS to update
   // sanitizes input so user can't update password or role
   // create error when user tries to update password
@@ -64,5 +103,6 @@ const deleteMe = async (req, res, next) => {
 
 ///// LOAD AND EXPORT HANDLERS /////
 exports.getMe = getMe;
+exports.uploadUserPhoto = uploadUserPhoto;
 exports.updateMe = catchAsync(updateMe);
 exports.deleteMe = catchAsync(deleteMe);
