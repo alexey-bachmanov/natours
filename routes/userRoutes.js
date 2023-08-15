@@ -22,7 +22,11 @@ router.route('/me').get(userController.getMe, userController.getUser);
 router.route('/updateMyPassword').patch(authController.updatePassword);
 router
   .route('/updateMe')
-  .patch(userController.uploadUserPhoto, userController.updateMe);
+  .patch(
+    userController.uploadUserPhoto,
+    userController.resizeUserPhoto,
+    userController.updateMe
+  );
 router.route('/deleteMe').delete(userController.deleteMe);
 
 // ↓ require admin for everything below this point ↓

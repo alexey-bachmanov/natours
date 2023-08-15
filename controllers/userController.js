@@ -1,4 +1,5 @@
 const multer = require('multer');
+const sharp = require('sharp');
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
@@ -6,16 +7,19 @@ const factory = require('./handlerFactory');
 
 ///// MULTER SETUP /////
 // set up storage
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'public/img/users');
-  },
-  filename: (req, file, cb) => {
-    // store as user-{userID}-{timestamp}.jpeg
-    const ext = file.mimetype.split('/')[1]; // 'img/jpeg' → 'jpeg'
-    cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
-  },
-});
+// save directly to disk:
+// const multerStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'public/img/users');
+//   },
+//   filename: (req, file, cb) => {
+//     // store as user-{userID}-{timestamp}.jpeg
+//     const ext = file.mimetype.split('/')[1]; // 'img/jpeg' → 'jpeg'
+//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+//   },
+// });
+// save to memory buffer:
+const multerStorage = multer.memoryStorage();
 
 // set up multer filter
 // is the uploaded file an image? if so pass true into cb()
@@ -57,6 +61,22 @@ const getMe = (req, res, next) => {
 // with included images, and attatches info to req.file
 const uploadUserPhoto = upload.single('photo');
 
+// resizeUserPhoto crops and scales incoming photos so they're a
+// square aspect ratio and a reasonable size.
+const resizeUserPhoto = (req, res, next) => {
+  if (!req.file) return next();
+  // store as user-{userID}-{timestamp}.jpeg
+  // set file.filename so updateMe has access to it
+  req.file.filename = `user-${req.user.id}-${Date.now()}.jpg`;
+  // resize / compress / convert image and save it to public/img/users/...
+  sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .jpeg({ quality: 95 })
+    .toFile(`public/img/users/${req.file.filename}`);
+  next();
+};
+
 ///// HANDLERS /////
 exports.getAllUsers = factory.getAll(User);
 exports.getUser = factory.getOne(User, 'id');
@@ -64,8 +84,6 @@ exports.patchUser = factory.patchOne(User, 'id');
 exports.deleteUser = factory.deleteOne(User, 'id');
 
 const updateMe = async (req, res, next) => {
-  console.log(req.file);
-  console.log(req.body);
   // required FIELDS to update
   // sanitizes input so user can't update password or role
   // create error when user tries to update password
@@ -76,6 +94,8 @@ const updateMe = async (req, res, next) => {
 
   // sanitize inputs to only the ones that can be updated
   filteredBody = filterObj(req.body, 'userName', 'email');
+  // if an image was uploaded with multer, add that path to our filter
+  if (req.file) filteredBody.photo = req.file.filename;
 
   // update user document
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
@@ -88,6 +108,7 @@ const updateMe = async (req, res, next) => {
     user: {
       userName: updatedUser.userName,
       email: updatedUser.email,
+      photo: updatedUser.photo,
       role: updatedUser.role,
     },
   });
@@ -104,5 +125,6 @@ const deleteMe = async (req, res, next) => {
 ///// LOAD AND EXPORT HANDLERS /////
 exports.getMe = getMe;
 exports.uploadUserPhoto = uploadUserPhoto;
+exports.resizeUserPhoto = resizeUserPhoto;
 exports.updateMe = catchAsync(updateMe);
 exports.deleteMe = catchAsync(deleteMe);
