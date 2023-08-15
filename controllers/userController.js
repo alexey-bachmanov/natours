@@ -5,7 +5,7 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 
-///// MULTER SETUP /////
+///// MULTER CONFIGURATION /////
 // set up storage
 // save directly to disk:
 // const multerStorage = multer.diskStorage({
@@ -59,17 +59,21 @@ const getMe = (req, res, next) => {
 
 // upload.single processes image uploads. it parses incoming formdata
 // with included images, and attatches info to req.file
+// upload.single('field') for single images
+// upload.array('field', 3) for an array of 3
+// upload.fields([{name: 'field1', maxCount: 3}, {name: 'field2', maxCount: 4}])
+// for multiple fields
 const uploadUserPhoto = upload.single('photo');
 
 // resizeUserPhoto crops and scales incoming photos so they're a
 // square aspect ratio and a reasonable size.
-const resizeUserPhoto = (req, res, next) => {
+const resizeUserPhoto = async (req, res, next) => {
   if (!req.file) return next();
   // store as user-{userID}-{timestamp}.jpeg
   // set file.filename so updateMe has access to it
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpg`;
   // resize / compress / convert image and save it to public/img/users/...
-  sharp(req.file.buffer)
+  await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 95 })
@@ -125,6 +129,6 @@ const deleteMe = async (req, res, next) => {
 ///// LOAD AND EXPORT HANDLERS /////
 exports.getMe = getMe;
 exports.uploadUserPhoto = uploadUserPhoto;
-exports.resizeUserPhoto = resizeUserPhoto;
+exports.resizeUserPhoto = catchAsync(resizeUserPhoto);
 exports.updateMe = catchAsync(updateMe);
 exports.deleteMe = catchAsync(deleteMe);

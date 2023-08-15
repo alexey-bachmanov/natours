@@ -1,7 +1,26 @@
+const multer = require('multer');
+const sharp = require('sharp');
 const Tour = require('../models/tourModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
+
+///// MULTER CONFIGURATION /////
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(true);
+  } else {
+    cb(new AppError('Not an image. Please only upload images.', 400), false);
+  }
+};
+
+const upload = multer({
+  dest: 'public/img/users',
+  storage: multerStorage,
+  filter: multerFilter,
+});
 
 ///// MIDDLEWARE FUNCTIONS /////
 exports.aliasTopTours = (req, res, next) => {
@@ -11,6 +30,47 @@ exports.aliasTopTours = (req, res, next) => {
   req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
   next();
 };
+
+// set up multer to upload to imageCover and images in DB
+// upload.single('field') for single images, creates req.file
+// upload.array('field', 3) for an array of 3, creates req.files
+// upload.fields([{name: 'field1', maxCount: 3}, {name: 'field2', maxCount: 3}])
+// for multiple fields, creates req.files
+exports.uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 },
+]);
+
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  if (!req.files.imageCover || !req.files.images) return next();
+
+  // process cover image
+  // save to req.body, so patchOne factory function grabs it and updates tour doc
+  req.body.imageCover = `tour-${req.params.tourId}-${Date.now()}-cover.jpg`;
+  // resize / compress / convert image and save it to public/img/users/...
+  await sharp(req.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat('jpeg')
+    .jpeg({ quality: 95 })
+    .toFile(`public/img/tours/${req.body.imageCover}`);
+
+  // process the images array
+  req.body.images = [];
+  // create array of promises
+  const promises = req.files.images.map(async (image, i) => {
+    const filename = `tour-${req.params.tourId}-${Date.now()}-${i + 1}.jpg`;
+    await sharp(image.buffer)
+      .resize(2000, 1333)
+      .toFormat('jpeg')
+      .jpeg({ quality: 95 })
+      .toFile(`public/img/tours/${filename}`);
+    req.body.images.push(filename);
+  });
+  // await fulfillment of all promises
+  await Promise.all(promises);
+  console.log(req.body);
+  next();
+});
 
 ///// HANDLERS /////
 exports.createTour = factory.createOne(Tour);
@@ -183,6 +243,7 @@ const getTourDistancesHandler = async (req, res, next) => {
 // --calls catchAsync, which:
 // ----calls handler, which creates response or error
 // --errors are caught in .catch and passed to error-handling middleware in app.js
+
 exports.getTourStats = catchAsync(getTourStatsHandler);
 exports.getMonthlyPlan = catchAsync(getMonthlyPlanHandler);
 exports.getToursWithin = catchAsync(getToursWithinHandler);
