@@ -39,13 +39,17 @@ if (leafletMap) {
 ///// USER DATA UPDATE CODE /////
 if (userDataForm) {
   // you're on the user data page
-  userDataForm.addEventListener('submit', (e) => {
+  userDataForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const userName = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
+    // build a multipart/form-data object
+    const form = new FormData();
+    form.append('userName', document.getElementById('name').value);
+    form.append('email', document.getElementById('email').value);
+    // files is an array, select file 1 of 1 and append it to the form
+    form.append('photo', document.getElementById('photo').files[0]);
 
-    updateSettings({ userName, email }, 'data');
+    await updateSettings(form, 'data');
   });
   userPasswordForm.addEventListener('submit', async (e) => {
     e.preventDefault();
