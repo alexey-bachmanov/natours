@@ -2,13 +2,11 @@ import axios from 'axios';
 
 import { showAlert } from './alerts';
 
-const HOSTNAME = 'http://localhost:3000';
-
 export const login = async (email, password) => {
   try {
     const res = await axios({
       method: 'POST',
-      url: `${HOSTNAME}/api/v1/users/login`,
+      url: `/api/v1/users/login`,
       data: {
         email,
         password,
@@ -30,7 +28,7 @@ export const logout = async () => {
   try {
     const res = await axios({
       method: 'GET',
-      url: `${HOSTNAME}/api/v1/users/logout`,
+      url: `/api/v1/users/logout`,
     });
     // if request went through, force reload of the page
     if (res.data.status === 'success') location.reload(true);

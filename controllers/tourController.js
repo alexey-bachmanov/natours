@@ -68,7 +68,6 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
   });
   // await fulfillment of all promises
   await Promise.all(promises);
-  console.log(req.body);
   next();
 });
 

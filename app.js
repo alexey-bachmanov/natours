@@ -9,6 +9,7 @@ const xssClean = require('./utils/xssCleaner');
 const hpp = require('hpp');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const AppError = require('./utils/appError');
 const globalErrorController = require('./controllers/errorController');
@@ -91,6 +92,8 @@ app.use(
     ],
   })
 );
+// compression for html and json:
+app.use(compression());
 // development logging:
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 

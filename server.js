@@ -30,4 +30,3 @@ const server = app.listen(PORT, '127.0.0.1', () => {
   if (process.env.NODE_ENV === 'development')
     console.log(`listening on port ${PORT}...`);
 });
-console.log(`Environment: ${process.env.NODE_ENV}`); // TODO: comment this line out

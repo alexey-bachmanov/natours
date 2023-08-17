@@ -1,0 +1,2 @@
+// REMEMBER TO USE RELATIVE URLS
+// '/api/v1/...'
