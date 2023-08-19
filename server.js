@@ -22,17 +22,20 @@ const app = require('./app');
 ///// DB CONFIGS /////
 const DB = process.env.MDB_URI.replace('<PASSWORD>', process.env.MDB_PWD);
 mongoose.connect(DB).then(() => {
-  if (process.env.NODE_ENV === 'development') console.log(`DB connected...`);
+  console.log(`DB connected...`);
 });
 
 ///// SERVER START /////
-const server = app.listen(PORT, '127.0.0.1', () => {
-  if (process.env.NODE_ENV === 'development')
+if (process.env.NODE_ENV === 'development') {
+  // run development server on localhost
+  // usu 127.0.0.1:3000
+  app.listen(PORT, '127.0.0.1', () => {
     console.log(`listening on port ${PORT}...`);
-});
-
-// TODO: add api/v1/healthz route that always returns 200 (for production monitoring)
-// TODO: set up sendgrid for emails
-// TODO: set up stripe for payments
-// TODO: ? implement password reset page
-// TODO: ? implement signup page
+  });
+} else {
+  // run production server on Render
+  // usu 0.0.0.0:10000
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`listening on port ${PORT}...`);
+  });
+}
