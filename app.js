@@ -107,6 +107,13 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 // mount routers
 // view routes:
 app.use('/', viewRouter);
+// 'health check' route
+app.use('/api/v1/healthz', (req, res, next) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'server online',
+  });
+});
 // api routes:
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);

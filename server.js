@@ -30,3 +30,9 @@ const server = app.listen(PORT, '127.0.0.1', () => {
   if (process.env.NODE_ENV === 'development')
     console.log(`listening on port ${PORT}...`);
 });
+
+// TODO: add api/v1/healthz route that always returns 200 (for production monitoring)
+// TODO: set up sendgrid for emails
+// TODO: set up stripe for payments
+// TODO: ? implement password reset page
+// TODO: ? implement signup page
