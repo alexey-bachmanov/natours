@@ -7,7 +7,8 @@
     "main": false
   },
   "scripts": {
-    "start": "nodemon server.js",
+    "dev": "nodemon server.js",
+    "start": "node server.js",
     "debug": "ndb server.js",
     "watch:js": "parcel serve ./public/js/index.js --dist-dir ./public/js/bundled --hmr-port 8080",
     "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/bundled"
@@ -44,5 +45,8 @@
     "buffer": "^6.0.3",
     "parcel": "^2.9.3",
     "process": "^0.11.10"
+  },
+  "engines": {
+    "node": ">=10.0.0"
   }
 }
