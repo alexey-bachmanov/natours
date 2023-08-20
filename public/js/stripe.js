@@ -1,5 +1,3 @@
-// REMEMBER TO USE RELATIVE URLS
-// '/api/v1/...'
 import axios from 'axios';
 import { showAlert } from './alerts';
 const stripe = Stripe(
