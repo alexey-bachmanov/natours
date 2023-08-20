@@ -4,6 +4,7 @@ import 'regenerator-runtime/runtime';
 import { login, logout } from './login';
 import { displayMap } from './leaflet';
 import { updateSettings } from './updateSettings';
+import { bookTour } from './stripe';
 
 ///// DOM ELEMENTS /////
 const loginForm = document.getElementById('login-form');
@@ -11,6 +12,7 @@ const logoutBtn = document.querySelector('.nav__el--logout');
 const leafletMap = document.getElementById('map');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
+const bookBtn = document.getElementById('book-tour');
 
 ///// LOGIN CODE /////
 if (loginForm) {
@@ -76,5 +78,16 @@ if (userDataForm) {
     // reset button to 'Save password' again
     document.getElementById('button-save-password').textContent =
       'Save password';
+  });
+}
+
+///// STRIPE CHECKOUT CODE /////
+if (bookBtn) {
+  // you're on the tour details page and logged in
+  bookBtn.addEventListener('click', (e) => {
+    // change button text
+    bookBtn.textContent = 'Processing...';
+    // pull tourId from checkout button and book that tour
+    bookTour(bookBtn.dataset.tourId);
   });
 }

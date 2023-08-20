@@ -37,6 +37,7 @@ const scriptSrcUrls = [
   'https://unpkg.com/',
   'https://tile.openstreetmap.org',
   'https://cdnjs.cloudflare.com',
+  'https://js.stripe.com',
 ];
 const styleSrcUrls = [
   'https://unpkg.com/',
@@ -50,6 +51,7 @@ const connectSrcUrls = [
   'ws://localhost:8080', // for parcel websocket
 ];
 const fontSrcUrls = ['fonts.googleapis.com', 'fonts.gstatic.com'];
+const frameSrcUrls = ['https://js.stripe.com'];
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
@@ -61,6 +63,7 @@ app.use(
       objectSrc: [],
       imgSrc: ["'self'", 'blob:', 'data:', 'https:'],
       fontSrc: ["'self'", ...fontSrcUrls],
+      frameSrc: ["'self'", ...frameSrcUrls],
     },
   })
 );
