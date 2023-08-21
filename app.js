@@ -68,7 +68,10 @@ app.use(
   })
 );
 // set up CORS
+//  simple requests:
 app.use(cors());
+//  non-simple requests (preflights, options, patch/delete, cookies)
+app.options('*', cors());
 // rate limit:
 const limiter = rateLimit({
   max: 100,

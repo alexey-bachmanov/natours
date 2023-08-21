@@ -12,7 +12,7 @@ const signToken = function (body) {
   });
 };
 
-const createSendToken = function (user, statusCode, res) {
+const createSendToken = function (user, statusCode, req, res) {
   const token = signToken({ id: user._id });
 
   const cookieOptions = {
@@ -120,7 +120,7 @@ const signup = async (req, res, next) => {
   });
   const url = `${req.protocol}://${req.get('host')}/login`;
   await new Email(newUser, url).sendWelcome();
-  createSendToken(newUser, 201, res);
+  createSendToken(newUser, 201, req, res);
 };
 
 const login = async (req, res, next) => {
@@ -139,7 +139,7 @@ const login = async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
 
   // if everything is ok, send token to client
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 };
 
 const logout = async (req, res, next) => {
@@ -207,7 +207,7 @@ const resetPassword = async (req, res, next) => {
   await user.save();
 
   // Log the user in (send JWT)
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 };
 
 const updatePassword = async (req, res, next) => {
@@ -231,7 +231,7 @@ const updatePassword = async (req, res, next) => {
   await user.save();
 
   // log user in
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 };
 
 ///// LOAD AND EXPORT HANDLERS /////
