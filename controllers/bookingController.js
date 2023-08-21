@@ -1,5 +1,7 @@
-const Tour = require('../models/tourModel');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const Tour = require('../models/tourModel');
+const Booking = require('../models/bookingModel');
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 ///// HANDLERS /////
@@ -9,7 +11,10 @@ const getCheckoutSession = async (req, res, next) => {
 
   // create checkout session
   const session = await stripe.checkout.sessions.create({
-    success_url: `${req.protocol}://${req.get('host')}/`,
+    // temporary solution until we get webhooks working
+    success_url: `${req.protocol}://${req.get('host')}/?tour=${
+      req.params.tourId
+    }&user=${req.user.id}&price=${tour.price}`,
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
@@ -40,5 +45,16 @@ const getCheckoutSession = async (req, res, next) => {
   });
 };
 
+const createBookingCheckout = async (req, res, next) => {
+  // temporary because unsecure, will be fixed with webhooks
+  const { tour, user, price } = req.query;
+  if (!tour || !user || !price) return next(); // go to the views router
+  // if you have tour, user, and price, create a booking
+  await Booking.create({ tour, user, price });
+  // and redirect to the home page without the query string
+  res.redirect(`${req.protocol}://${req.get('host')}`);
+};
+
 ///// LOAD AND EXPORT HANDLERS /////
 exports.getCheckoutSession = catchAsync(getCheckoutSession);
+exports.createBookingCheckout = catchAsync(createBookingCheckout);

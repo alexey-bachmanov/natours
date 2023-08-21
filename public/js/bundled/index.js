@@ -7122,8 +7122,6 @@ const updateSettings = async (data, type)=>{
 };
 
 },{"axios":"jo6P5","./alerts":"6Mcnf","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"10tSC":[function(require,module,exports) {
-// REMEMBER TO USE RELATIVE URLS
-// '/api/v1/...'
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "bookTour", ()=>bookTour);
