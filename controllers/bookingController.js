@@ -3,6 +3,7 @@ const Tour = require('../models/tourModel');
 const Booking = require('../models/bookingModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const factory = require('./handlerFactory');
 
 ///// HANDLERS /////
 const getCheckoutSession = async (req, res, next) => {
@@ -54,6 +55,16 @@ const createBookingCheckout = async (req, res, next) => {
   // and redirect to the home page without the query string
   res.redirect(`${req.protocol}://${req.get('host')}`);
 };
+
+exports.createBooking = factory.createOne(Booking);
+
+exports.getAllBookings = factory.getAll(Booking);
+
+exports.getBooking = factory.getOne(Booking, 'id');
+
+exports.patchBooking = factory.patchOne(Booking, 'id');
+
+exports.deleteBooking = factory.deleteOne(Booking, 'id');
 
 ///// LOAD AND EXPORT HANDLERS /////
 exports.getCheckoutSession = catchAsync(getCheckoutSession);
