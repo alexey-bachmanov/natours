@@ -15,6 +15,9 @@ router.get(
 router.get('/tour/:slug', authController.isLoggedIn, viewsController.getTour);
 router.get('/login', authController.isLoggedIn, viewsController.getLoginForm);
 router.route('/me').get(authController.protect, viewsController.getAccount);
+router
+  .route('/my-tours')
+  .get(authController.protect, viewsController.getMyTours);
 
 // user update form submission
 // router.post(
