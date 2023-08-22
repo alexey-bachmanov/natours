@@ -6,6 +6,7 @@
   "targets": {
     "main": false
   },
+  "browserlist": "> 0.5%",
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
@@ -46,8 +47,5 @@
     "buffer": "^6.0.3",
     "parcel": "^2.9.3",
     "process": "^0.11.10"
-  },
-  "engines": {
-    "node": ">=10.0.0"
   }
 }
