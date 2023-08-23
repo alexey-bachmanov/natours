@@ -18,6 +18,7 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
+const bookingController = require('./controllers/bookingController');
 const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
@@ -79,6 +80,14 @@ const limiter = rateLimit({
   message: 'Too many requests from this address',
 });
 app.use('/api', limiter);
+// stripe webhook checkout route
+// this is out of place because stripe needs RAW data, not processed JSON,
+// so it wouldn't work after app.use(express.json())
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout
+);
 // parse body, form, and cookie data into req.body:
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
