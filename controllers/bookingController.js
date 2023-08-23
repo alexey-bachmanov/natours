@@ -14,9 +14,6 @@ const createBooking = async (session) => {
   const user = (await User.findOne({ email: session.customer_email })).id;
   // find price in the session info
   const price = session.amount_total / 100;
-  console.log('TOUR:', tour);
-  console.log('USER:', user);
-  console.log('PRICE:', price);
   await Booking.create({ tour, user, price });
 };
 
@@ -57,16 +54,6 @@ const getCheckoutSession = async (req, res, next) => {
     session: session,
   });
 };
-
-// const createBookingCheckout = async (req, res, next) => {
-//   // temporary because unsecure, will be fixed with webhooks
-//   const { tour, user, price } = req.query;
-//   if (!tour || !user || !price) return next(); // go to the views router
-//   // if you have tour, user, and price, create a booking
-//   await Booking.create({ tour, user, price });
-//   // and redirect to the home page without the query string
-//   res.redirect(`${req.protocol}://${req.get('host')}`);
-// };
 
 const webhookCheckoutHandler = async (req, res, next) => {
   // this is route is called by stripe on a successful payment
