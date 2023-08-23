@@ -83,8 +83,9 @@ const webhookCheckoutHandler = async (req, res, next) => {
     return res.status(400).send(`Webhook error: ${err.message}`);
   }
 
+  console.log('SIGNATURE:', signature);
+  console.log('EVENT:', event);
   if (event.type === 'checkout.session.complete') {
-    console.log('EVENT:', event);
     // create booking in our database
     createBooking(event.data.object);
   }
