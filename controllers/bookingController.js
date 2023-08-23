@@ -14,6 +14,9 @@ const createBooking = async (session) => {
   const user = (await User.findOne({ email: session.customer_email })).id;
   // find price in the session info
   const price = session.amount_total / 100;
+  console.log('TOUR:', tour);
+  console.log('USER:', user);
+  console.log('PRICE:', price);
   await Booking.create({ tour, user, price });
 };
 
@@ -81,6 +84,7 @@ const webhookCheckoutHandler = async (req, res, next) => {
   }
 
   if (event.type === 'checkout.session.complete') {
+    console.log('EVENT:', event);
     // create booking in our database
     createBooking(event.data.object);
   }
