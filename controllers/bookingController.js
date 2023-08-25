@@ -24,7 +24,8 @@ const getCheckoutSession = async (req, res, next) => {
 
   // create checkout session
   const session = await stripe.checkout.sessions.create({
-    success_url: `${req.protocol}://${req.get('host')}/my-tours`,
+    // on success, redirect to my-tours and pass along infor to show in alert
+    success_url: `${req.protocol}://${req.get('host')}/my-tours?alert=booking`,
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,

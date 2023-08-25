@@ -1,4 +1,4 @@
-export const showAlert = (type, msg) => {
+export const showAlert = (type, msg, time = 5000) => {
   // type must be either 'success' or 'error'
   // hide any open alerts
   hideAlert();
@@ -7,7 +7,7 @@ export const showAlert = (type, msg) => {
   // spawn in an alert modal
   document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
   // hide any alerts after 5s
-  window.setTimeout(hideAlert, 5000);
+  window.setTimeout(hideAlert, time);
 };
 
 export const hideAlert = () => {

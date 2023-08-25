@@ -5,6 +5,7 @@ import { login, logout } from './login';
 import { displayMap } from './leaflet';
 import { updateSettings } from './updateSettings';
 import { bookTour } from './stripe';
+import { showAlert } from './alerts';
 
 ///// DOM ELEMENTS /////
 const loginForm = document.getElementById('login-form');
@@ -91,3 +92,8 @@ if (bookBtn) {
     bookTour(bookBtn.dataset.tourId);
   });
 }
+
+///// ALERT POPUP CODE /////
+// read alert content, if any
+const alertMessage = document.querySelector('body').dataset.alert;
+if (alertMessage) showAlert('success', alertMessage, 20000);

@@ -4,6 +4,15 @@ const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
+///// MIDDLEWARE /////
+const alertsHandler = async (req, res, next) => {
+  const alert = req.query.alert;
+  if (alert === 'booking')
+    res.locals.alert =
+      'Your booking was successful! Please check your email for confirmation';
+  next();
+};
+
 ///// HANDLERS /////
 const getOverviewHandler = async (req, res, next) => {
   // get tour data from collection
@@ -68,3 +77,4 @@ exports.getLoginForm = catchAsync(getLoginFormHandler);
 exports.getAccount = getAccountHandler;
 // exports.updateUserData = catchAsync(updateUserDataHandler);
 exports.getMyTours = catchAsync(getMyToursHandler);
+exports.alerts = catchAsync(alertsHandler);
