@@ -21,9 +21,15 @@ const app = require('./app');
 
 ///// DB CONFIGS /////
 const DB = process.env.MDB_URI.replace('<PASSWORD>', process.env.MDB_PWD);
-mongoose.connect(DB).then(() => {
-  console.log(`DB connected...`);
-});
+mongoose
+  .connect(DB, {
+    bufferCommands: false,
+    autoCreate: false,
+    dbName: 'Natours',
+  })
+  .then(() => {
+    console.log(`DB connected...`);
+  });
 
 ///// SERVER START /////
 if (process.env.NODE_ENV === 'development') {
